@@ -1,132 +1,58 @@
-let itens = [];
+
+var total = 0;
 
 function adicionarItem() {
 
-    const produto = document.getElementById("produto").value;
-    const quantidade = Number(document.getElementById("quantidade").value);
-    const valor = Number(document.getElementById("valor").value);
+    var produto = document.getElementById("produto").value;
+    var quantidade = Number(document.getElementById("quantidade").value);
+    var valor = Number(document.getElementById("valor").value);
 
-    if (produto === "") {
-        alert("Digite o nome do produto ou serviço.");
-        return;
+    if (produto == "" || quantidade <= 0 || valor <= 0) {
+        alert("Preencha os campos corretamente!");
     }
+    else {
 
-    if (quantidade <= 0) {
-        alert("Digite uma quantidade válida.");
-        return;
+        var subtotal = quantidade * valor;
+
+        document.getElementById("listaItens").innerHTML +=
+            "<tr>" +
+            "<td>" + produto + "</td>" +
+            "<td>" + quantidade + "</td>" +
+            "<td>R$ " + valor.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "</td>" +
+            "<td>R$ " + subtotal.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "</td>" +
+            "</tr>";
+
+        total = total + subtotal;
+
+        calcularTotal();
+
+        document.getElementById("produto").value = "";
+        document.getElementById("quantidade").value = 1;
+        document.getElementById("valor").value = "";
     }
-
-    if (valor <= 0) {
-        alert("Digite um valor válido.");
-        return;
-    }
-
-    const item = {
-        produto: produto,
-        quantidade: quantidade,
-        valor: valor
-    };
-
-    itens.push(item);
-
-    atualizarTabela();
-
-    document.getElementById("produto").value = "";
-    document.getElementById("quantidade").value = 1;
-    document.getElementById("valor").value = "";
-
-    document.getElementById("produto").focus();
 }
-
-
-function atualizarTabela() {
-
-    const lista = document.getElementById("listaItens");
-
-    lista.innerHTML = "";
-
-    itens.forEach(function(item, index) {
-
-        const subtotal = item.quantidade * item.valor;
-
-        const linha = document.createElement("tr");
-
-        linha.innerHTML = `
-            <td>${item.produto}</td>
-
-            <td>${item.quantidade}</td>
-
-            <td>${formatarMoeda(item.valor)}</td>
-
-            <td>${formatarMoeda(subtotal)}</td>
-
-            <td>
-                <button 
-                    class="botao-excluir"
-                    onclick="excluirItem(${index})">
-                    Excluir
-                </button>
-            </td>
-        `;
-
-        lista.appendChild(linha);
-    });
-
-    calcularTotal();
-}
-
-
-function excluirItem(index) {
-
-    itens.splice(index, 1);
-
-    atualizarTabela();
-}
-
 
 function calcularTotal() {
 
-    let subtotal = 0;
+    var desconto = Number(document.getElementById("desconto").value);
 
-    itens.forEach(function(item) {
-
-        subtotal += item.quantidade * item.valor;
-
-    });
-
-    let porcentagemDesconto =
-        Number(document.getElementById("desconto").value);
-
-    if (porcentagemDesconto < 0) {
-        porcentagemDesconto = 0;
+    if (desconto < 0) {
+        desconto = 0;
     }
 
-    if (porcentagemDesconto > 100) {
-        porcentagemDesconto = 100;
+    if (desconto > 100) {
+        desconto = 100;
     }
 
-    const valorDesconto =
-        subtotal * (porcentagemDesconto / 100);
+    var valorDesconto = total * desconto / 100;
+    var totalFinal = total - valorDesconto;
 
-    const total =
-        subtotal - valorDesconto;
+    document.getElementById("subtotal").innerHTML =
+        total.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-    document.getElementById("subtotal").textContent =
-        formatarMoeda(subtotal);
+    document.getElementById("valorDesconto").innerHTML =
+        valorDesconto.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-    document.getElementById("valorDesconto").textContent =
-        formatarMoeda(valorDesconto);
-
-    document.getElementById("total").textContent =
-        formatarMoeda(total);
-}
-
-
-function formatarMoeda(valor) {
-
-    return valor.toLocaleString("pt-BR", {
-        style: "currency",
-        currency: "BRL"
-    });
-
+    document.getElementById("total").innerHTML =
+        totalFinal.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
